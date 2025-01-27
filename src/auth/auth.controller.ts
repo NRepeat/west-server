@@ -1,5 +1,4 @@
 import {
-  Body,
   Controller,
   Get,
   HttpCode,
@@ -9,20 +8,29 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { LoginService } from './login/login.service';
-import { AuthGuard } from './auth.guard';
+import { LocalAuthGuard } from './guards/local-auth.guard';
+import { User } from 'user/user.service';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
   constructor(private loginService: LoginService) {}
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  signIn(@Body() signInDto: Record<string, any>) {
-    return this.loginService.signIn(signInDto.email, signInDto.password);
+  @UseGuards(LocalAuthGuard)
+  login(@Request() req: Request & { user: User }) {
+    return this.loginService.signIn(req.user);
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Get('profile')
-  getProfile(@Request() req) {
+  getProfile(@Request() req: Request & { user: User }) {
     return req.user;
+  }
+
+  @UseGuards(LocalAuthGuard)
+  @Post('logout')
+  logout(@Request() req: Request & { logout: () => void }) {
+    return req.logout();
   }
 }

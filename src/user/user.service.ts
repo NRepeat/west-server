@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-type User = { password: string; email: string; id: string };
+export type User = { password: string; email: string; id: string };
 @Injectable()
 export class UserService {
   private readonly users: User[] = [
