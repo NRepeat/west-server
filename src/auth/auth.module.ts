@@ -8,14 +8,13 @@ import { UserService } from 'user/user/user.service';
 
 @Module({
   imports: [
-    UserService,
     JwtModule.register({
       global: true,
       secret: 'secret',
       signOptions: { expiresIn: '60s' },
     }),
   ],
-  providers: [LoginService, RegisterService, LogoutService],
+  providers: [LoginService, RegisterService, LogoutService, UserService],
   controllers: [AuthController],
 })
 export class AuthModule {}
