@@ -4,6 +4,7 @@ import { UserService } from 'user/user.service';
 @Injectable()
 export class AuthService {
   constructor(private userService: UserService) {}
+
   validateUser(email: string, pass: string) {
     const user = this.userService.findOne(email);
     if (!user) {

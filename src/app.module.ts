@@ -4,20 +4,12 @@ import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { CommonModule } from './common/common.module';
-import { ConfigModule } from '@nestjs/config';
-import { appConfig } from 'common/config/config.service';
+
 import { UserService } from 'user/user.service';
+import { CustomConfigModule } from 'common/config/config.module';
 
 @Module({
-  imports: [
-    UserModule,
-    AuthModule,
-    CommonModule,
-    ConfigModule.forRoot({
-      isGlobal: true,
-      load: [appConfig],
-    }),
-  ],
+  imports: [UserModule, AuthModule, CommonModule, CustomConfigModule],
   controllers: [AppController],
   providers: [AppService, UserService],
 })
