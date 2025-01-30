@@ -1,11 +1,8 @@
-import {
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { compare } from 'bcrypt';
 import { UserRepository } from 'prisma/repositories/user/module/user.repository';
 import { INormalizedUser, IUser } from 'shared/types';
+import { normalizeUser } from './normalize-user.helper';
 
 @Injectable()
 export class BcryptHelper {
@@ -18,7 +15,7 @@ export class BcryptHelper {
 
     if (!user) throw new UnauthorizedException();
 
-    const isPasswordValid = await compare(params.password, user.password);
+    const isPasswordValid = await compare(params.password!, user.password!);
 
     if (!isPasswordValid) throw new UnauthorizedException();
 

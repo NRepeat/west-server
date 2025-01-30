@@ -1,4 +1,4 @@
-import { UserToSignupDto } from 'auth/dto/user-to-signup.dto';
+import { UserToSignupDto } from 'modules/auth/dto/user-to-signup.dto';
 import { UserRepositoryHelper } from '../helpers/user-repository.helper';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
@@ -29,13 +29,20 @@ export class UserRepository {
   }
 
   async findByIdAndUpdate(
-    id: number,
-    data: Pick<
-      IUser,
-      'email' | 'password' | 'telephone' | 'firstName' | 'lastName'
+    email: string,
+    data: Partial<
+      Pick<
+        IUser,
+        | 'email'
+        | 'password'
+        | 'telephone'
+        | 'firstName'
+        | 'lastName'
+        | 'refreshTokenUpdatedAt'
+      >
     >,
   ) {
-    return this.prisma.user.update({ where: { id }, data });
+    return this.prisma.user.update({ where: { email }, data });
   }
 
   async findById(id: number) {

@@ -15,7 +15,7 @@ export interface IUser {
   password: string | null;
   refreshTokenUpdatedAt: Date | null;
 }
-export type IUserToSignup = Omit<IUser, '_id' | 'refreshTokenUpdatedAt'>;
+export type IUserToSignup = Omit<IUser, 'refreshTokenUpdatedAt'>;
 
 export type INormalizedUser = Pick<
   IUser,
