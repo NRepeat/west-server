@@ -15,6 +15,10 @@ export class CustomConfigService extends ConfigService<
   readonly BCRYPT_SALT_ROUNDS: EnvironmentVariables['BCRYPT_SALT_ROUNDS'];
   readonly ACCESS_TOKEN_SECRET: EnvironmentVariables['ACCESS_TOKEN_SECRET'];
   readonly REFRESH_TOKEN_SECRET: EnvironmentVariables['REFRESH_TOKEN_SECRET'];
+
+  readonly GOOGLE_CLIENT_ID: EnvironmentVariables['GOOGLE_CLIENT_ID'];
+  readonly GOOGLE_CLIENT_SECRET: EnvironmentVariables['GOOGLE_CLIENT_SECRET'];
+  readonly GOOGLE_CALLBACK_URL: EnvironmentVariables['GOOGLE_CALLBACK_URL'];
   constructor() {
     super();
 
@@ -35,6 +39,15 @@ export class CustomConfigService extends ConfigService<
       this.get('REFRESH_TOKEN_SECRET', {
         infer: true,
       }),
+    );
+    this.GOOGLE_CLIENT_ID = String(
+      this.get('GOOGLE_CLIENT_ID', { infer: true }),
+    );
+    this.GOOGLE_CLIENT_SECRET = String(
+      this.get('GOOGLE_CLIENT_SECRET', { infer: true }),
+    );
+    this.GOOGLE_CALLBACK_URL = String(
+      this.get('GOOGLE_CALLBACK_URL', { infer: true }),
     );
   }
 }

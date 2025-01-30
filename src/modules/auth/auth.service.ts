@@ -22,12 +22,14 @@ export class AuthService {
     return this.jwtHelper.getTokens(params);
   }
   async createUser(params: IUserToSignup): Promise<INormalizedUser> {
-    const { firstName, lastName, email, password, telephone } = params;
+    const { firstName, lastName, email, password, telephone, provider } =
+      params;
     const existUser = await this.userRepository.findByEmail(email);
     if (existUser) {
       throw new BadRequestException('User already exists');
     }
     const user = await this.userRepository.create({
+      provider,
       firstName,
       lastName,
       email,
@@ -40,14 +42,16 @@ export class AuthService {
 
   async updateUserRefreshToken(
     params: Pick<IUser, 'refreshTokenUpdatedAt' | 'email' | 'refreshToken'>,
-  ): Promise<void> {
+  ): Promise<INormalizedUser> {
     const { email, refreshTokenUpdatedAt, refreshToken } = params;
     const hashedRefreshToken =
       await this.userRepositoryHelper.getHashedRefreshToken({ refreshToken });
-    await this.userRepository.findByEmailAndUpdate(email, {
+    const user = await this.userRepository.findByEmailAndUpdate(email, {
       refreshToken: hashedRefreshToken,
       refreshTokenUpdatedAt,
     });
+
+    return normalizeUser(user);
   }
 
   async validateUserPassword(
