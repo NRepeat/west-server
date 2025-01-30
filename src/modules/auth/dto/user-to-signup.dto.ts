@@ -10,6 +10,9 @@ import { MESSAGES } from 'shared/constants';
 import { IUser, IUserToSignup } from 'shared/types';
 
 export class UserToSignupDto implements IUserToSignup {
+  @IsString()
+  provider: IUser['provider'];
+
   @IsNotEmpty()
   @IsEmail()
   email: IUser['email'];

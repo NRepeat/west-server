@@ -20,6 +20,9 @@ export class TokenHelper {
     if (createdAt !== user.refreshTokenUpdatedAt.toISOString()) {
       throw new UnauthorizedException();
     }
+    if (!user.refreshToken) {
+      throw new UnauthorizedException();
+    }
     const normalizedUser = normalizeUser(user);
     return normalizedUser;
   }

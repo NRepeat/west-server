@@ -18,6 +18,7 @@ export const MESSAGES = {
 export const STRATEGIES_NAMES = {
   accessToken: 'jwt',
   refreshToken: 'jwt-refresh',
+  google: 'google',
 } as const;
 
 export const DECORATORS_KEYS = {

@@ -2,10 +2,11 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { TokenHelper } from 'modules/auth/helpers/token.helper';
 import { CustomConfigService } from 'common/config/config.service';
-import { ExtractJwt, Strategy } from 'passport-jwt';
+import { Strategy } from 'passport-jwt';
 import { STRATEGIES_NAMES } from 'shared/constants';
 import { INormalizedUser, JwtPayload } from 'shared/types';
 import { Request } from 'express';
+import { extractJwtFromCookie } from '../helpers/extract-jwt-from-cookie.helper';
 
 @Injectable()
 export class RefreshTokenStrategy extends PassportStrategy(
@@ -17,7 +18,7 @@ export class RefreshTokenStrategy extends PassportStrategy(
     private tokenHelper: TokenHelper,
   ) {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: extractJwtFromCookie,
       secretOrKey: customConfigService.REFRESH_TOKEN_SECRET,
       passReqToCallback: true,
     });

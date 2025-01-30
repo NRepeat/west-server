@@ -19,6 +19,7 @@ model User {
   first_name String?
   last_name  String?
   telephone  Int?
+  provider   String?  @default("local")
   email      String   @unique
   refreshTokenUpdatedAt DateTime?
   refreshToken String?

@@ -3,9 +3,10 @@ import { PassportStrategy } from '@nestjs/passport';
 import { TokenHelper } from 'modules/auth/helpers/token.helper';
 import { CustomConfigService } from 'common/config/config.service';
 import type { Request } from 'express';
-import { ExtractJwt, Strategy } from 'passport-jwt';
+import { Strategy } from 'passport-jwt';
 import { STRATEGIES_NAMES } from 'shared/constants';
 import { INormalizedUser, JwtPayload } from 'shared/types';
+import { extractJwtFromCookie } from '../helpers/extract-jwt-from-cookie.helper';
 
 @Injectable()
 export class AccessTokenStrategy extends PassportStrategy(
@@ -17,7 +18,7 @@ export class AccessTokenStrategy extends PassportStrategy(
     private tokenHelper: TokenHelper,
   ) {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: extractJwtFromCookie,
       secretOrKey: customConfigService.ACCESS_TOKEN_SECRET,
       passReqToCallback: true,
     });

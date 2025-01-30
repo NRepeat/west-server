@@ -5,9 +5,18 @@ export interface EnvironmentVariables {
   DATABASE_URL: string;
   NODE_ENV: 'development' | 'production';
   PORT: number;
+  GOOGLE_CLIENT_ID: string;
+  GOOGLE_CLIENT_SECRET: string;
+  GOOGLE_CALLBACK_URL: string;
 }
-
+export interface IGoogleUser {
+  provider: string;
+  email: string;
+  name: { givenName: string; familyName: string };
+  picture: string;
+}
 export interface IUser {
+  provider: string;
   email: string;
   firstName: string | null;
   lastName: string | null;

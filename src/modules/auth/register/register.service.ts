@@ -8,8 +8,10 @@ export class RegisterService {
   constructor(private authService: AuthService) {}
   async signup(params: SignupParams): Promise<SignupResponseDto> {
     const { userToSignup } = params;
-    const { firstName, lastName, telephone, email, password } = userToSignup;
+    const { provider, firstName, lastName, telephone, email, password } =
+      userToSignup;
     const user = await this.authService.createUser({
+      provider,
       firstName,
       lastName,
       telephone,
