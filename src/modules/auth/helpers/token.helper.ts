@@ -9,6 +9,7 @@ export class TokenHelper {
 
   async validateTokenByUser(payload: JwtPayload): Promise<INormalizedUser> {
     const { createdAt, email } = payload;
+    console.log('params', email);
 
     const user = await this.userRepository.findByEmail(email);
     if (!user) {
@@ -20,7 +21,7 @@ export class TokenHelper {
     if (createdAt !== user.refreshTokenUpdatedAt.toISOString()) {
       throw new UnauthorizedException();
     }
-
-    return normalizeUser(user);
+    const normalizedUser = normalizeUser(user);
+    return normalizedUser;
   }
 }

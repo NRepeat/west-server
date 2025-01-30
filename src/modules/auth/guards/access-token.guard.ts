@@ -8,6 +8,7 @@ export class AccessTokenGuard extends AuthGuard(STRATEGIES_NAMES.accessToken) {
   constructor(private reflector: Reflector) {
     super();
   }
+
   canActivate(context: ExecutionContext) {
     const isPublic = this.reflector.getAllAndOverride<boolean>(
       DECORATORS_KEYS.public,
@@ -16,6 +17,7 @@ export class AccessTokenGuard extends AuthGuard(STRATEGIES_NAMES.accessToken) {
     if (isPublic) {
       return true;
     }
+
     return super.canActivate(context);
   }
 }

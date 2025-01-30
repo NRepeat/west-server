@@ -11,6 +11,8 @@ export class BcryptHelper {
   async validateUserPassword(
     params: Pick<IUser, 'email' | 'password'>,
   ): Promise<INormalizedUser> {
+    console.log('params', params);
+
     const user = await this.userRepository.findByEmail(params.email);
 
     if (!user) throw new UnauthorizedException();

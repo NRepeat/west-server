@@ -24,6 +24,7 @@ export class AccessTokenStrategy extends PassportStrategy(
   }
 
   async validate(_req: Request, payload: JwtPayload): Promise<INormalizedUser> {
+    console.log('payload', payload);
     return this.tokenHelper.validateTokenByUser(payload);
   }
 }

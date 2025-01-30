@@ -8,12 +8,7 @@ export class LoginService {
   constructor(private authService: AuthService) {}
   async login(params: LoginParams): Promise<LoginResponseDto> {
     const { userToLogin } = params;
-    const { email, password } = userToLogin;
-
-    const user = await this.authService.validateUserPassword({
-      email,
-      password,
-    });
+    const { email } = userToLogin;
 
     const { createdAt, refreshToken, accessToken } =
       await this.authService.getTokens({
@@ -25,6 +20,6 @@ export class LoginService {
       refreshTokenUpdatedAt: createdAt,
     });
 
-    return { refreshToken, accessToken, user };
+    return { refreshToken, accessToken, user: userToLogin };
   }
 }

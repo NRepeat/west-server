@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Post,
@@ -12,12 +13,13 @@ import { LocalAuthGuard } from './guards/local-auth.guard';
 import { UserToSignupDto } from './dto/user-to-signup.dto';
 import { SignupResponseDto } from './dto/response/signup-response.dto';
 import { RegisterService } from './register/register.service';
-import { UserToLoginDto } from './dto/user-to-login.dto';
 import { LoginResponseDto } from './dto/response/login-response.dto';
 import { RefreshTokenGuard } from './guards/refresh-token.guard';
-import { IUser } from 'shared/types';
+import { INormalizedUser } from 'shared/types';
 import { RefreshResponseDto } from './dto/response/refresh-response.dto';
 import { RefreshService } from './refresh/refresh.service';
+import { AccessTokenGuard } from './guards/access-token.guard';
+import { Public } from 'shared/decorators/public.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -29,6 +31,7 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Post('signup')
+  @Public()
   async signup(
     @Body() userToSignup: UserToSignupDto,
   ): Promise<SignupResponseDto> {
@@ -36,14 +39,26 @@ export class AuthController {
   }
 
   @HttpCode(HttpStatus.OK)
+  @Public()
+  @UseGuards(LocalAuthGuard)
   @Post('login')
-  login(@Body() userToLogin: UserToLoginDto): Promise<LoginResponseDto> {
-    return this.loginService.login({ userToLogin });
+  login(@Request() req: { user: INormalizedUser }): Promise<LoginResponseDto> {
+    return this.loginService.login({ userToLogin: req.user });
   }
 
+  @UseGuards(AccessTokenGuard)
+  @Get('profile')
+  profile(@Request() req: { user: INormalizedUser }) {
+    return req.user;
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Post('refresh')
   @UseGuards(RefreshTokenGuard)
-  refresh(@Request() user: Pick<IUser, 'email'>): Promise<RefreshResponseDto> {
-    return this.refreshService.refresh(user);
+  refresh(
+    @Request() req: { user: INormalizedUser },
+  ): Promise<RefreshResponseDto> {
+    return this.refreshService.refresh(req.user);
   }
 
   @UseGuards(LocalAuthGuard)

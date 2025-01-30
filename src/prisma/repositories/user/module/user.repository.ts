@@ -28,7 +28,7 @@ export class UserRepository {
     return user;
   }
 
-  async findByIdAndUpdate(
+  async findByEmailAndUpdate(
     email: string,
     data: Partial<
       Pick<

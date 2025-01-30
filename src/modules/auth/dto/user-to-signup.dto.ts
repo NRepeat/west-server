@@ -14,11 +14,9 @@ export class UserToSignupDto implements IUserToSignup {
   @IsEmail()
   email: IUser['email'];
 
-  @IsNotEmpty()
   @IsString()
   firstName: IUser['firstName'];
 
-  @IsNotEmpty()
   @IsString()
   lastName: IUser['lastName'];
 

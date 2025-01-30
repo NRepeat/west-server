@@ -38,7 +38,7 @@ export class AuthService {
   ): Promise<void> {
     const { email, refreshTokenUpdatedAt } = params;
 
-    await this.userRepository.findByIdAndUpdate(email, {
+    await this.userRepository.findByEmailAndUpdate(email, {
       refreshTokenUpdatedAt,
     });
   }

@@ -7,6 +7,7 @@ import { IUser } from 'shared/types';
 export class RefreshService {
   constructor(readonly authService: AuthService) {}
   async refresh(user: Pick<IUser, 'email'>): Promise<RefreshResponseDto> {
+    console.log('user', user);
     const { refreshToken, accessToken, createdAt } =
       await this.authService.getTokens({
         email: user.email,
