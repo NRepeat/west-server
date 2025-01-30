@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  ForbiddenException,
   Get,
   HttpCode,
   HttpStatus,
@@ -20,7 +21,6 @@ import { RefreshResponseDto } from './dto/response/refresh-response.dto';
 import { RefreshService } from './refresh/refresh.service';
 import { AccessTokenGuard } from './guards/access-token.guard';
 import { Public } from 'shared/decorators/public.decorator';
-
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -56,9 +56,18 @@ export class AuthController {
   @Post('refresh')
   @UseGuards(RefreshTokenGuard)
   refresh(
-    @Request() req: { user: INormalizedUser },
+    @Request()
+    req: Request & {
+      user: { currentRefreshToken: string; user: INormalizedUser };
+    },
   ): Promise<RefreshResponseDto> {
-    return this.refreshService.refresh(req.user);
+    if (!req.user.currentRefreshToken) {
+      throw new ForbiddenException('Access Denied');
+    }
+    return this.refreshService.refresh(
+      req.user.user,
+      req.user.currentRefreshToken,
+    );
   }
 
   @UseGuards(LocalAuthGuard)

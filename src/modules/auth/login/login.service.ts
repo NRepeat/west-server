@@ -15,8 +15,9 @@ export class LoginService {
         email,
       });
 
-    await this.authService.updateUserRefreshTokenUpdatedAt({
+    await this.authService.updateUserRefreshToken({
       email,
+      refreshToken,
       refreshTokenUpdatedAt: createdAt,
     });
 

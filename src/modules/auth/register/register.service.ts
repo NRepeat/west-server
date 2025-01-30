@@ -9,7 +9,6 @@ export class RegisterService {
   async signup(params: SignupParams): Promise<SignupResponseDto> {
     const { userToSignup } = params;
     const { firstName, lastName, telephone, email, password } = userToSignup;
-
     const user = await this.authService.createUser({
       firstName,
       lastName,
@@ -23,7 +22,8 @@ export class RegisterService {
         email: user.email,
       });
 
-    await this.authService.updateUserRefreshTokenUpdatedAt({
+    await this.authService.updateUserRefreshToken({
+      refreshToken,
       email: user.email,
       refreshTokenUpdatedAt: createdAt,
     });

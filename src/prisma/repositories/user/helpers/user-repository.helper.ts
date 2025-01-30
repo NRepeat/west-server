@@ -6,7 +6,14 @@ import { IUser } from 'shared/types';
 @Injectable()
 export class UserRepositoryHelper {
   constructor(private customConfigService: CustomConfigService) {}
-
+  getHashedRefreshToken({
+    refreshToken,
+  }: Pick<IUser, 'refreshToken'>): Promise<string> {
+    return hash(
+      refreshToken ?? '',
+      this.customConfigService.BCRYPT_SALT_ROUNDS,
+    );
+  }
   async getHashedPassword({
     password,
   }: Pick<IUser, 'password'>): Promise<string> {

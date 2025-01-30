@@ -7,12 +7,15 @@ import { normalizeUser } from './normalize-user.helper';
 @Injectable()
 export class BcryptHelper {
   constructor(private userRepository: UserRepository) {}
-
+  async validateUserRefreshToken(params: {
+    refreshToken: string;
+    userRefreshToken: string;
+  }): Promise<boolean> {
+    return compare(params.refreshToken, params.userRefreshToken);
+  }
   async validateUserPassword(
     params: Pick<IUser, 'email' | 'password'>,
   ): Promise<INormalizedUser> {
-    console.log('params', params);
-
     const user = await this.userRepository.findByEmail(params.email);
 
     if (!user) throw new UnauthorizedException();

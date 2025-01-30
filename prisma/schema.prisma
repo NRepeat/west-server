@@ -21,6 +21,7 @@ model User {
   telephone  Int?
   email      String   @unique
   refreshTokenUpdatedAt DateTime?
+  refreshToken String?
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
   // payments    User_payment[] @relation(name: "User_payment")

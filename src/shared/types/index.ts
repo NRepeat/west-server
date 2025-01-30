@@ -13,13 +13,22 @@ export interface IUser {
   lastName: string | null;
   telephone: number | null;
   password: string | null;
+  refreshToken: string | null;
   refreshTokenUpdatedAt: Date | null;
 }
-export type IUserToSignup = Omit<IUser, 'refreshTokenUpdatedAt'>;
+export type IUserToSignup = Omit<
+  IUser,
+  'refreshTokenUpdatedAt' | 'refreshToken'
+>;
 
 export type INormalizedUser = Pick<
   IUser,
-  'lastName' | 'email' | 'firstName' | 'telephone' | 'refreshTokenUpdatedAt'
+  | 'lastName'
+  | 'email'
+  | 'firstName'
+  | 'telephone'
+  | 'refreshTokenUpdatedAt'
+  | 'refreshToken'
 >;
 
 export interface Tokens {

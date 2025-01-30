@@ -9,7 +9,6 @@ export class TokenHelper {
 
   async validateTokenByUser(payload: JwtPayload): Promise<INormalizedUser> {
     const { createdAt, email } = payload;
-    console.log('params', email);
 
     const user = await this.userRepository.findByEmail(email);
     if (!user) {

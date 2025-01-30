@@ -38,6 +38,7 @@ export class UserRepository {
         | 'telephone'
         | 'firstName'
         | 'lastName'
+        | 'refreshToken'
         | 'refreshTokenUpdatedAt'
       >
     >,
