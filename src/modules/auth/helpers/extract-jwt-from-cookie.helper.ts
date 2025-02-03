@@ -13,6 +13,7 @@ export const extractJwtFromCookie = (req: Request) => {
       {} as { [key: string]: string },
     );
     token = cookies ? cookies['access_token'] : null;
+    console.log('token', token);
   }
   return token || ExtractJwt.fromAuthHeaderAsBearerToken()(req);
 };

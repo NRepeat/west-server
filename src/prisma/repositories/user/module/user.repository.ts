@@ -10,7 +10,7 @@ export class UserRepository {
   constructor(
     private userRepositoryHelper: UserRepositoryHelper,
     private prisma: PrismaService,
-  ) {}
+  ) { }
 
   async create(params: UserToSignupDto) {
     const { email, firstName, lastName, password, telephone, provider } =
@@ -57,7 +57,7 @@ export class UserRepository {
     try {
       const user = await this.prisma.user.findUnique({ where: { email } });
       if (!user) {
-        throw new Error(MESSAGES.notFond({ property: email }));
+        return null;
       }
       return this.prisma.user.findUnique({ where: { email } });
     } catch {

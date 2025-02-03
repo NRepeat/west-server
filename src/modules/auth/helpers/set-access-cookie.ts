@@ -10,6 +10,7 @@ export const setAccessCookie = (
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'none',
   });
+  return res;
 };
 
 export const clearAccessCookie = (

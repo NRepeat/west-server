@@ -37,20 +37,20 @@ export class AuthController {
     private readonly refreshService: RefreshService,
     private readonly googleService: GoogleService,
     private readonly logoutService: LogoutService,
-  ) {}
+  ) { }
 
   @HttpCode(HttpStatus.OK)
   @Post('signup')
   @Public()
-  async signup(@Body() userToSignup: UserToSignupDto, @Res() res: Response) {
+  async signup(@Body() userData: UserToSignupDto, @Res() res: Response) {
+    console.log('userToSignup', userData);
     const { refreshToken, accessToken, user } =
       await this.registerService.signup({
-        userToSignup,
+        userToSignup: userData,
       });
-    setAccessCookie(res, 'refresh_token', refreshToken);
-    setAccessCookie(res, 'access_token', accessToken);
-
-    return user;
+    res.cookie('access_token', accessToken, { httpOnly: true, secure: true, sameSite: 'strict' });
+    res.cookie('refresh_token', refreshToken, { httpOnly: true, secure: true, sameSite: 'strict' });
+    return res.json(user);
   }
 
   @HttpCode(HttpStatus.OK)
@@ -60,19 +60,28 @@ export class AuthController {
   async login(
     @Request() req: { user: INormalizedUser },
     @Res() res: Response,
-  ): Promise<INormalizedUser> {
+  ) {
     const { refreshToken, accessToken, user } = await this.loginService.login({
       email: req.user.email,
     });
-    setAccessCookie(res, 'refresh_token', refreshToken);
-    setAccessCookie(res, 'access_token', accessToken);
-    return user;
+    res.cookie('access_token', accessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+    });
+    res.cookie('refresh_token', refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+    });
+    return res.json(user);
   }
 
   @UseGuards(AccessTokenGuard)
   @Get('profile')
-  profile(@Request() req: { user: INormalizedUser }) {
-    return req.user;
+  profile(@Request() req: { user: INormalizedUser }, @Res() res: Response) {
+    console.log('req.user', req.user);
+    return res.json({ user: req.user });
   }
 
   @HttpCode(HttpStatus.OK)
@@ -92,9 +101,17 @@ export class AuthController {
       req.user.user,
       req.user.currentRefreshToken,
     );
-    setAccessCookie(res, 'refresh_token', refreshToken);
-    setAccessCookie(res, 'access_token', accessToken);
-    return res;
+    res.cookie('access_token', accessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+    });
+    res.cookie('refresh_token', refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+    });
+    return res.json({ refreshToken, accessToken });
   }
 
   @UseGuards(AccessTokenGuard)
@@ -108,13 +125,14 @@ export class AuthController {
   ) {
     clearAccessCookie(res, 'refresh_token');
     clearAccessCookie(res, 'access_token');
-    return this.logoutService.logout(req.user.email);
+    const user = this.logoutService.logout(req.user.email);
+    return res.json(user);
   }
 
   @Public()
   @Get('google')
   @UseGuards(GoogleOauthGuard)
-  async auth() {}
+  async auth() { }
 
   @Public()
   @Get('google/callback')
@@ -127,7 +145,17 @@ export class AuthController {
       user: req.user,
     });
     setAccessCookie(res, 'refresh_token', refreshToken);
-    setAccessCookie(res, 'access_token', accessToken);
+    // setAccessCookie(res, 'access_token', accessToken);
+    res.cookie('access_token', accessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+    });
+    res.cookie('refresh_token', refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+    });
 
     return res.redirect('http://localhost:5173');
   }
