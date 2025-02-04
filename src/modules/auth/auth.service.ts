@@ -9,6 +9,7 @@ import {
 import { INormalizedUser, IUser, IUserToSignup } from 'shared/types';
 import { normalizeUser } from './helpers/normalize-user.helper';
 import { UserRepositoryHelper } from 'prisma/repositories/user/helpers/user-repository.helper';
+import { generateUuid } from './helpers/uuid.helper';
 
 @Injectable()
 export class AuthService {
@@ -17,7 +18,7 @@ export class AuthService {
     private jwtHelper: JwtServices,
     private userRepository: UserRepository,
     private userRepositoryHelper: UserRepositoryHelper,
-  ) {}
+  ) { }
   async getTokens(params: GetTokensParams): GetTokensReturnValue {
     return this.jwtHelper.getTokens(params);
   }

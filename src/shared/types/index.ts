@@ -1,3 +1,5 @@
+import { StoreSession } from "@prisma/client";
+
 export interface EnvironmentVariables {
   BCRYPT_SALT_ROUNDS: number;
   ACCESS_TOKEN_SECRET: string;
@@ -17,6 +19,7 @@ export interface IGoogleUser {
 }
 export interface IUser {
   provider: string;
+  uuid: string;
   email: string;
   firstName: string | null;
   lastName: string | null;
@@ -27,7 +30,7 @@ export interface IUser {
 }
 export type IUserToSignup = Omit<
   IUser,
-  'refreshTokenUpdatedAt' | 'refreshToken'
+  'refreshTokenUpdatedAt' | 'refreshToken' | 'uuid'
 >;
 
 export type INormalizedUser = Pick<
@@ -49,3 +52,4 @@ export interface JwtPayload extends Pick<IUser, 'email'> {
   email: string;
   createdAt: string;
 }
+export type SerializedSession = Pick<StoreSession, 'uuid'> & { cartId: string } 

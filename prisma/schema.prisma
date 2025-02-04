@@ -14,18 +14,68 @@ datasource db {
 }
 
 model User {
-  id         Int      @id @default(autoincrement())
-  password   String?
-  first_name String?
-  last_name  String?
-  telephone  Int?
-  provider   String?  @default("local")
-  email      String   @unique
+  id                    Int            @id @default(autoincrement())
+  uuid                  String
+  password              String?
+  first_name            String?
+  last_name             String?
+  telephone             Int?
+  provider              String?        @default("local")
+  email                 String         @unique
   refreshTokenUpdatedAt DateTime?
-  refreshToken String?
+  refreshToken          String?
+  created_at            DateTime       @default(now())
+  updated_at            DateTime       @updatedAt
+  // payments    User_payment[] @relation(name: "User_payment")
+  StoreSession          StoreSession[]
+  Cart                  Cart[]
+}
+
+model StoreSession {
+  id         Int      @id @default(autoincrement())
+  uuid       String   @unique
+  user_id    Int?
+  user       User?    @relation(fields: [user_id], references: [id])
+  cart       Cart     @relation(fields: [cartId], references: [id])
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
-  // payments    User_payment[] @relation(name: "User_payment")
+  cartId     Int
+}
+
+model Cart {
+  id             Int            @id @default(autoincrement())
+  uuid           String         @unique
+  user_id        Int?
+  user           User?          @relation(fields: [user_id], references: [id])
+  items          CartItem[]
+  created_at     DateTime       @default(now())
+  updated_at     DateTime       @updatedAt
+  storeSessionId String
+  StoreSession   StoreSession[]
+}
+
+model CartItem {
+  id         Int      @id @default(autoincrement())
+  uuid       String
+  cart_id    Int
+  cart       Cart     @relation(fields: [cart_id], references: [id])
+  product_id Int
+  product    Product  @relation(fields: [product_id], references: [id])
+  quantity   Int
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model Product {
+  id          Int        @id @default(autoincrement())
+  uuid        String
+  name        String
+  description String
+  price       Float
+  image       String
+  created_at  DateTime   @default(now())
+  updated_at  DateTime   @updatedAt
+  CartItem    CartItem[]
 }
 
 // model User_payment { 

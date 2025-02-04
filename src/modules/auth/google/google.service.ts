@@ -11,11 +11,10 @@ export class GoogleService {
     readonly userService: UserRepository,
     readonly registerService: RegisterService,
     readonly loginService: LoginService,
-  ) {}
+  ) { }
 
   async signup(params: { user: IGoogleUser }): Promise<SignupResponseDto> {
     const { email, name, provider } = params.user;
-    console.log('email', email);
     const existsUser = await this.userService.findByEmail(email);
     if (existsUser) {
       const { refreshToken, accessToken, user } = await this.loginService.login(

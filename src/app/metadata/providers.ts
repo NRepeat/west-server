@@ -7,10 +7,10 @@ import { UserService } from 'modules/user/user.service';
 import { PrismaService } from 'prisma/prisma.service';
 
 export const PROVIDERS: ModuleMetadata['providers'] = [
-  {
-    provide: APP_GUARD,
-    useClass: AccessTokenGuard,
-  },
+  // {
+  //   provide: APP_GUARD,
+  //   useClass: AccessTokenGuard,
+  // },
   AppService,
   UserService,
   PrismaService,

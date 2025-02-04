@@ -4,6 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
 import { IUser } from 'shared/types';
 import { MESSAGES } from 'shared/constants';
+import { generateUuid } from 'modules/auth/helpers/uuid.helper';
 
 @Injectable()
 export class UserRepository {
@@ -18,9 +19,12 @@ export class UserRepository {
     const hashPassword = await this.userRepositoryHelper.getHashedPassword({
       password,
     });
+    const uuid = generateUuid()
+
     const user = await this.prisma.user.create({
       data: {
         email,
+        uuid,
         provider,
         password: hashPassword,
         telephone,

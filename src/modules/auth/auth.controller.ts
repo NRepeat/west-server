@@ -141,11 +141,10 @@ export class AuthController {
     @Req() req: Request & { user: IGoogleUser },
     @Res() res: Response,
   ) {
-    const { accessToken, refreshToken } = await this.googleService.signup({
+    const { accessToken, refreshToken, user } = await this.googleService.signup({
       user: req.user,
     });
-    setAccessCookie(res, 'refresh_token', refreshToken);
-    // setAccessCookie(res, 'access_token', accessToken);
+
     res.cookie('access_token', accessToken, {
       httpOnly: true,
       secure: true,
@@ -156,7 +155,11 @@ export class AuthController {
       secure: true,
       sameSite: 'none',
     });
-
+    res.cookie('user', JSON.stringify(user), {
+      httpOnly: false,
+      secure: true,
+      sameSite: 'none',
+    })
     return res.redirect('http://localhost:5173');
   }
 }
