@@ -59,23 +59,60 @@ model CartItem {
   uuid       String
   cart_id    Int
   cart       Cart     @relation(fields: [cart_id], references: [id])
-  product_id Int
-  product    Product  @relation(fields: [product_id], references: [id])
+  product_id String
+  product    Product  @relation(fields: [product_id], references: [uuid])
   quantity   Int
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
 }
 
 model Product {
-  id          Int        @id @default(autoincrement())
-  uuid        String
-  name        String
-  description String
-  price       Float
-  image       String
-  created_at  DateTime   @default(now())
-  updated_at  DateTime   @updatedAt
-  CartItem    CartItem[]
+  id              Int                         @id @default(autoincrement())
+  uuid            String                      @unique
+  slug            String                      @unique
+  created_at      DateTime                    @default(now())
+  updated_at      DateTime                    @updatedAt
+  cartItems       CartItem[]
+  productVariants ProductVariantsOnProducts[]
+}
+
+model ProductVariant {
+  id              Int                         @id @default(autoincrement())
+  uuid            String                      @unique
+  color           String
+  description     String?
+  slug            String?
+  images          String[]
+  thumbnail       String
+  price           Float
+  width           String
+  weight          String
+  diameter        String
+  et              String
+  pcd             String
+  created_at      DateTime                    @default(now())
+  updated_at      DateTime                    @updatedAt
+  products        ProductVariantsOnProducts[]
+  productInvetory ProductInvetory[]
+}
+
+model ProductInvetory {
+  id                 Int            @id @default(autoincrement())
+  product_variant_id Int
+  product            ProductVariant @relation(fields: [product_variant_id], references: [id])
+  quantity           Int
+  created_at         DateTime       @default(now())
+  updated_at         DateTime       @updatedAt
+}
+
+model ProductVariantsOnProducts {
+  productId Int
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  productVariantId Int
+  productVariant   ProductVariant @relation(fields: [productVariantId], references: [id], onDelete: Cascade)
+
+  @@id([productVariantId, productId])
 }
 
 // model User_payment { 

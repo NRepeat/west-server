@@ -9,8 +9,60 @@ export class CartRepository {
 		private prisma: PrismaService,
 	) { }
 	async getCart({ uuid }: { uuid: string }) {
-		const cart = await this.prisma.cart.findUnique({ where: { uuid }, include: { items: true } })
+		const cart = await this.prisma.cart.findUnique({ where: { uuid }, include: { items: { include: { product: true } } } })
 		return cart
+	}
+	async addToCart({ cartId, productId }: { cartId: string, productId: string }) {
+		// Ensure productId is a number
+
+
+
+		// Ensure cart exists and get its current state
+		const cart = await this.prisma.cart.findUnique({
+			where: { uuid: cartId },
+			include: { items: true }, // To get the current items in the cart
+		});
+
+		if (!cart) {
+			throw new Error('Cart not found');
+		}
+
+		// Check if the product already exists in the cart
+		const existingItem = cart.items.find(item => item.product_id === productId);
+		console.log('existingItem', existingItem)
+
+		if (existingItem) {
+			// If the product exists, update the quantity (you can customize this part)
+			const updatedCart = await this.prisma.cart.update({
+				where: { uuid: cartId },
+				data: {
+					items: {
+						update: {
+							where: { id: existingItem.id },
+							data: {
+								quantity: existingItem.quantity + 1,
+							},
+						},
+					},
+				},
+			});
+			return updatedCart;
+		} else {
+			const newCartItem = await this.prisma.cart.update({
+				where: { uuid: cartId },
+				data: {
+					items: {
+						create: {
+							uuid: generateUuid(),
+							product_id: productId,
+							quantity: 1,
+						},
+					},
+				},
+			});
+
+			return newCartItem;
+		}
 	}
 	async updateCart({ uuid, data }: { uuid: string, data: CartItem[] }) {
 		const cart = await this.prisma.cart.update({
@@ -18,7 +70,7 @@ export class CartRepository {
 			data: {
 				items: {
 					create: data.map((item) => ({
-						roduct_id: item.product_id,
+						product_id: item.product_id,
 						product: { connect: { id: item.product_id } },
 						uuid: item.uuid,
 						quantity: item.quantity,

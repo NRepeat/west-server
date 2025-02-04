@@ -13,4 +13,7 @@ export class CartService {
 	async getCart({ cartId }: { cartId: string }) {
 		return await this.cartRepository.getCart({ uuid: cartId })
 	}
+	async addToCart({ cartId, productId }: { cartId: string, productId: string }) {
+		return await this.cartRepository.addToCart({ cartId, productId })
+	}
 }
