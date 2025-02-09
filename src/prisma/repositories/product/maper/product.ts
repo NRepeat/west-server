@@ -1,7 +1,6 @@
-import { Product, ProductVariant, ProductVariantsOnProducts } from "@prisma/client";
-import { ProductT } from "shared/types";
+import { Product, ProductVariant } from "@prisma/client";
 
-export const serializeProducts = async (productsData: (Product & { productVariants: { productVariant: ProductVariant }[] })[]) => {
+export const serializeProducts = (productsData: (Product & { productVariants: { productVariant: ProductVariant }[] })[]) => {
 	const products = productsData.map((product) => ({
 		uuid: product.uuid,
 		id: product.id,

@@ -46,6 +46,7 @@ export class ProductRepository {
 			include: { productVariants: { include: { productVariant: true } } },
 		});
 		const products = serializeProducts(productsData)
+
 		return products
 	}
 	async getProductById(id: string) {

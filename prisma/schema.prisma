@@ -55,24 +55,24 @@ model Cart {
 }
 
 model CartItem {
-  id         Int      @id @default(autoincrement())
-  uuid       String
-  cart_id    Int
-  cart       Cart     @relation(fields: [cart_id], references: [id])
-  product_id String
-  product    Product  @relation(fields: [product_id], references: [uuid])
-  quantity   Int
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  id                 Int            @id @default(autoincrement())
+  uuid               String
+  cart_id            Int
+  cart               Cart           @relation(fields: [cart_id], references: [id])
+  product_variant_id String
+  product            ProductVariant @relation(fields: [product_variant_id], references: [uuid])
+  quantity           Int
+  created_at         DateTime       @default(now())
+  updated_at         DateTime       @updatedAt
 }
 
 model Product {
   id              Int                         @id @default(autoincrement())
   uuid            String                      @unique
   slug            String                      @unique
+  description     String?                     @default("")
   created_at      DateTime                    @default(now())
   updated_at      DateTime                    @updatedAt
-  cartItems       CartItem[]
   productVariants ProductVariantsOnProducts[]
 }
 
@@ -94,6 +94,7 @@ model ProductVariant {
   updated_at      DateTime                    @updatedAt
   products        ProductVariantsOnProducts[]
   productInvetory ProductInvetory[]
+  CartItem        CartItem[]
 }
 
 model ProductInvetory {

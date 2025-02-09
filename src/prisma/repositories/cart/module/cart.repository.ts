@@ -13,9 +13,6 @@ export class CartRepository {
 		return cart
 	}
 	async addToCart({ cartId, productId }: { cartId: string, productId: string }) {
-		// Ensure productId is a number
-
-
 
 		// Ensure cart exists and get its current state
 		const cart = await this.prisma.cart.findUnique({
@@ -28,9 +25,7 @@ export class CartRepository {
 		}
 
 		// Check if the product already exists in the cart
-		const existingItem = cart.items.find(item => item.product_id === productId);
-		console.log('existingItem', existingItem)
-
+		const existingItem = cart.items.find(item => item.product_variant_id === productId);
 		if (existingItem) {
 			// If the product exists, update the quantity (you can customize this part)
 			const updatedCart = await this.prisma.cart.update({
@@ -54,7 +49,7 @@ export class CartRepository {
 					items: {
 						create: {
 							uuid: generateUuid(),
-							product_id: productId,
+							product_variant_id: productId,
 							quantity: 1,
 						},
 					},
@@ -70,8 +65,8 @@ export class CartRepository {
 			data: {
 				items: {
 					create: data.map((item) => ({
-						product_id: item.product_id,
-						product: { connect: { id: item.product_id } },
+						product_id: item.uuid,
+						product: { connect: { id: item.product_variant_id } },
 						uuid: item.uuid,
 						quantity: item.quantity,
 					})),

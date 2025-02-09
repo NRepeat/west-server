@@ -9,7 +9,7 @@ export class ProductController {
 	) { }
 
 
-	@Get('')
+	@Get('products')
 	getProducts() {
 		return this.productService.getProducts()
 	}
