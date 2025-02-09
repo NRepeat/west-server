@@ -20,10 +20,14 @@ import { EnvironmentVariables } from 'shared/types';
         GOOGLE_CLIENT_ID: Joi.string().required(),
         GOOGLE_CLIENT_SECRET: Joi.string().required(),
         GOOGLE_CALLBACK_URL: Joi.string().required(),
+        AWS_S3_BUCKET_NAME: Joi.string().required(),
+        AWS_ACCESS_KEY: Joi.string().required(),
+        AWS_SECRET_ACCESS_KEY: Joi.string().required(),
+        AWS_S3_URL: Joi.string().required(),
       }),
     }),
   ],
   providers: [CustomConfigService],
   exports: [CustomConfigService],
 })
-export class CustomConfigModule {}
+export class CustomConfigModule { }

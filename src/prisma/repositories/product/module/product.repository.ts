@@ -10,7 +10,7 @@ export class ProductRepository {
 	constructor(
 		private prisma: PrismaService,
 	) { }
-	async createProduct(product: ProductT) {
+	async createProduct(product: ProductT,) {
 		const uuid = generateUuid()
 		const createdProduct = await this.prisma.product.create({
 			data: {

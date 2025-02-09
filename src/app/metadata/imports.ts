@@ -5,6 +5,7 @@ import { AuthModule } from 'modules/auth/auth.module';
 import { CartModule } from 'modules/cart/cart.module';
 import { ProductModule } from 'modules/product/product.module';
 import { SessionModule } from 'modules/session/session.module';
+import { StorageModule } from 'modules/storage/storage.module';
 import { UserModule } from 'modules/user/user.module';
 import { CartRepositoryModule } from 'prisma/repositories/cart/module/cart-repository.module';
 import { ProductRepositoryModule } from 'prisma/repositories/product/module/product-repository.module';
@@ -20,6 +21,7 @@ export const IMPORTS: ModuleMetadata['imports'] = [
   SessionModule,
   CartModule,
   CommonModule,
+  StorageModule,
   CustomConfigModule,
   SessionRepositoryModule,
   ProductRepositoryModule,

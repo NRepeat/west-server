@@ -19,6 +19,10 @@ export class CustomConfigService extends ConfigService<
   readonly GOOGLE_CLIENT_ID: EnvironmentVariables['GOOGLE_CLIENT_ID'];
   readonly GOOGLE_CLIENT_SECRET: EnvironmentVariables['GOOGLE_CLIENT_SECRET'];
   readonly GOOGLE_CALLBACK_URL: EnvironmentVariables['GOOGLE_CALLBACK_URL'];
+  readonly AWS_S3_BUCKET_NAME: EnvironmentVariables['AWS_S3_BUCKET_NAME'];
+  readonly AWS_ACCESS_KEY: EnvironmentVariables['AWS_ACCESS_KEY'];
+  readonly AWS_SECRET_ACCESS_KEY: EnvironmentVariables['AWS_SECRET_ACCESS_KEY'];
+  readonly AWS_S3_URL: EnvironmentVariables['AWS_S3_URL'];
   constructor() {
     super();
 
@@ -29,12 +33,24 @@ export class CustomConfigService extends ConfigService<
 
     this.DATABASE_URL = String(this.get('DATABASE_URL', { infer: true }));
 
+    this.AWS_S3_URL = String(this.get('AWS_S3_URL', { infer: true }));
+
     this.BCRYPT_SALT_ROUNDS = Number(
       this.get('BCRYPT_SALT_ROUNDS', { infer: true }),
     );
     this.ACCESS_TOKEN_SECRET = String(
       this.get('ACCESS_TOKEN_SECRET', { infer: true }),
     );
+    this.AWS_SECRET_ACCESS_KEY = String(
+      this.get('AWS_SECRET_ACCESS_KEY', { infer: true }),
+    );
+    this.AWS_ACCESS_KEY = String(
+      this.get('AWS_ACCESS_KEY', { infer: true }),
+    );
+    this.AWS_S3_BUCKET_NAME = String(
+      this.get('AWS_S3_BUCKET_NAME', { infer: true }),
+    );
+
     this.REFRESH_TOKEN_SECRET = String(
       this.get('REFRESH_TOKEN_SECRET', {
         infer: true,
