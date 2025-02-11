@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { AuthService } from 'modules/auth/auth.service';
 import { LoginResponseDto } from 'modules/auth/dto/response/login-response.dto';
+import { SessionService } from 'modules/session/session.service';
 
 @Injectable()
 export class LoginService {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService, private sessionService: SessionService) { }
   async login(params: { email: string }): Promise<LoginResponseDto> {
     const { email } = params;
 
@@ -13,12 +14,20 @@ export class LoginService {
         email,
       });
 
-    const user = await this.authService.updateUserRefreshToken({
+    const updatedUser = await this.authService.updateUserRefreshToken({
       email,
       refreshToken,
       refreshTokenUpdatedAt: createdAt,
     });
-
+    const newSession = await this.sessionService.createSession()
+    const connectedSession = await this.sessionService.connectUserToSession({
+      sessionId: newSession.uuid,
+      userId: updatedUser.uuid
+    })
+    const user = {
+      ...updatedUser,
+      sessionId: connectedSession.uuid
+    }
     return { refreshToken, accessToken, user };
   }
 }

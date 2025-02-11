@@ -44,8 +44,8 @@ export type INormalizedUser = Pick<
   | 'firstName'
   | 'telephone'
   | 'refreshTokenUpdatedAt'
-  | 'refreshToken'
->;
+  | 'refreshToken' | "uuid"
+> & { sessionId: string };
 
 export interface Tokens {
   accessToken: string;

@@ -1,7 +1,7 @@
 import { User } from '@prisma/client';
 import { INormalizedUser } from 'shared/types';
 
-export const normalizeUser = (user: User): INormalizedUser => {
+export const normalizeUser = (user: User & { StoreSession: { uuid: string }[] }): INormalizedUser => {
   const {
     email,
     first_name,
@@ -9,7 +9,10 @@ export const normalizeUser = (user: User): INormalizedUser => {
     telephone,
     refreshTokenUpdatedAt,
     refreshToken,
+    StoreSession,
+    uuid
   } = user;
+  console.log('userdddasd', user)
 
   return {
     email,
@@ -17,6 +20,8 @@ export const normalizeUser = (user: User): INormalizedUser => {
     lastName: last_name,
     telephone,
     refreshToken,
+    uuid,
     refreshTokenUpdatedAt,
+    sessionId: StoreSession && StoreSession.length > 0 ? StoreSession[0]?.uuid : '',
   };
 };

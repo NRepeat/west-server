@@ -24,7 +24,6 @@ export class CartRepository {
 			throw new Error('Cart not found');
 		}
 
-		// Check if the product already exists in the cart
 		const existingItem = cart.items.find(item => item.product_variant_id === productId);
 		if (existingItem) {
 			// If the product exists, update the quantity (you can customize this part)
@@ -40,6 +39,7 @@ export class CartRepository {
 						},
 					},
 				},
+				include: { items: true },
 			});
 			return updatedCart;
 		} else {
@@ -54,6 +54,7 @@ export class CartRepository {
 						},
 					},
 				},
+				include: { items: true },
 			});
 
 			return newCartItem;
@@ -65,8 +66,7 @@ export class CartRepository {
 			data: {
 				items: {
 					create: data.map((item) => ({
-						product_id: item.uuid,
-						product: { connect: { id: item.product_variant_id } },
+						product_variant_id: item.product_variant_id,
 						uuid: item.uuid,
 						quantity: item.quantity,
 					})),

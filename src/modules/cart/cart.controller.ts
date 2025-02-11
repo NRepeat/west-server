@@ -13,9 +13,10 @@ export class CartController {
 		return cart
 	}
 	@Put('add')
-	addToCart(@Body() body: { cartId: string, productId: string }) {
+	async addToCart(@Body() body: { cartId: string, productId: string }) {
 		console.log('body', body)
-		const cart = this.cartService.addToCart(body)
+		const cart = await this.cartService.addToCart(body)
+		console.log('cart', cart)
 		return cart
 	}
 }

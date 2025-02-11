@@ -31,6 +31,7 @@ export class UserRepository {
         first_name: firstName,
         last_name: lastName,
       },
+      include: { StoreSession: { select: { uuid: true } } }
     });
     return user;
   }
@@ -50,7 +51,7 @@ export class UserRepository {
       >
     >,
   ) {
-    return this.prisma.user.update({ where: { email }, data });
+    return this.prisma.user.update({ where: { email }, data, include: { StoreSession: { select: { uuid: true } } } });
   }
 
   async findById(id: number) {

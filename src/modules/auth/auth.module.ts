@@ -18,6 +18,7 @@ import { UserRepositoryHelper } from 'prisma/repositories/user/helpers/user-repo
 import { PrismaService } from 'prisma/prisma.service';
 import { CustomConfigService } from 'common/config/config.service';
 import { GoogleService } from './google/google.service';
+import { SessionService } from 'modules/session/session.service';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { GoogleService } from './google/google.service';
     RefreshService,
     RegisterService,
     UserService,
+    SessionService,
     LocalStrategy,
     AuthService,
     BcryptHelper,
@@ -51,4 +53,4 @@ import { GoogleService } from './google/google.service';
     LogoutService,
   ],
 })
-export class AuthModule {}
+export class AuthModule { }

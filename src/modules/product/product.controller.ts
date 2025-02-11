@@ -2,16 +2,11 @@ import {
 	Body,
 	Controller,
 	Get,
-	Injectable,
 	Post,
 	Query,
-	UploadedFile,
-	UploadedFiles,
-	UseInterceptors,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
-import { ImageFile, ProductT } from 'shared/types';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { ProductT } from 'shared/types';
 import { CreateProductDto } from './dto/product-create.dto';
 
 @Controller('product')
@@ -24,9 +19,9 @@ export class ProductController {
 	}
 
 	@Get('slug')
-	getProductBySlug(@Query('slug') slug: string) {
-		console.log('slug', slug);
-		return this.productService.getProductBySlug(slug);
+	getProductBySlug(@Query('slug') slug: string, @Query('variant') variant: string) {
+		console.log('variant', variant)
+		return this.productService.getProductBySlug(slug, variant);
 	}
 
 	@Post('create')

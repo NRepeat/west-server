@@ -66,7 +66,12 @@ export class ProductService {
 			console.log('error', error)
 		}
 	}
-	async getProductBySlug(slug: string) {
+	async getProductBySlug(slug: string, variant?: string) {
+		if (variant) {
+			const product = await this.productRepository.getProductBySlug(slug)
+			const productVariant = await this.productRepository.getProductVariantByUuid(variant)
+			return { product, productVariant }
+		}
 		const product = await this.productRepository.getProductBySlug(slug)
 		return product
 	}

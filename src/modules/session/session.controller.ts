@@ -14,6 +14,7 @@ export class SessionController {
 	}
 	@Post('sync')
 	syncSession(@Body() body: { activeSessionId: string, sessionId: string }) {
+		console.log('body', body)
 		const session = this.sessionService.syncSession(body)
 		return session
 	}

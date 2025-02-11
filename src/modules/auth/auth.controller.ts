@@ -28,6 +28,7 @@ import {
   clearAccessCookie,
   setAccessCookie,
 } from './helpers/set-access-cookie';
+import { SessionService } from 'modules/session/session.service';
 
 @Controller('auth')
 export class AuthController {
@@ -37,6 +38,7 @@ export class AuthController {
     private readonly refreshService: RefreshService,
     private readonly googleService: GoogleService,
     private readonly logoutService: LogoutService,
+    private readonly sessionService: SessionService,
   ) { }
 
   @HttpCode(HttpStatus.OK)
@@ -64,6 +66,9 @@ export class AuthController {
     const { refreshToken, accessToken, user } = await this.loginService.login({
       email: req.user.email,
     });
+    console.log('user', user)
+
+    // this.sessionService.getSession()
     res.cookie('access_token', accessToken, {
       httpOnly: true,
       secure: true,
