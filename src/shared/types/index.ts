@@ -1,4 +1,4 @@
-import { ProductVariant, StoreSession } from "@prisma/client";
+import { ProductVariant, StoreSession } from '@prisma/client';
 
 export interface EnvironmentVariables {
   BCRYPT_SALT_ROUNDS: number;
@@ -56,9 +56,29 @@ export interface JwtPayload extends Pick<IUser, 'email'> {
   email: string;
   createdAt: string;
 }
-export type SerializedSession = Pick<StoreSession, 'uuid'> & { cartId: string }
+export type SerializedSession = Pick<StoreSession, 'uuid'> & { cartId: string };
 
 export interface ProductT {
+  uuid: string;
   slug: string;
+  title: string;
+  description: string;
   variants: Omit<ProductVariant, 'id'>[] & { quantity: number }[];
+}
+
+export interface ProductWithVariants {
+  uuid: string;
+  slug: string;
+  productVariants: { productVariant: ProductVariant }[];
+}
+export interface ImageFile {
+  buffer: Express.Multer.File;
+  uuid: string;
+  isThumbnail: boolean;
+}
+
+export interface SavedImage {
+  url: string;
+  variantUuid: string;
+  isThumbnail: boolean;
 }

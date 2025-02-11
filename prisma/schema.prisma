@@ -71,33 +71,32 @@ model Product {
   uuid            String                      @unique
   slug            String                      @unique
   description     String?                     @default("")
+  title           String
   created_at      DateTime                    @default(now())
   updated_at      DateTime                    @updatedAt
   productVariants ProductVariantsOnProducts[]
 }
 
 model ProductVariant {
-  id              Int                         @id @default(autoincrement())
-  uuid            String                      @unique
-  color           String
-  description     String?
-  slug            String?
-  images          String[]
-  thumbnail       String
-  price           Float
-  width           String
-  weight          String
-  diameter        String
-  et              String
-  pcd             String
-  created_at      DateTime                    @default(now())
-  updated_at      DateTime                    @updatedAt
-  products        ProductVariantsOnProducts[]
-  productInvetory ProductInvetory[]
-  CartItem        CartItem[]
+  id               Int                         @id @default(autoincrement())
+  uuid             String                      @unique
+  color            String
+  images           String[]                    @default([])
+  thumbnail        String?                     @default("")
+  price            Float
+  width            Float
+  weight           Float
+  diameter         Float
+  et               Float
+  pcd              Float
+  created_at       DateTime                    @default(now())
+  updated_at       DateTime                    @updatedAt
+  products         ProductVariantsOnProducts[]
+  productInventory ProductInventory[]
+  CartItem         CartItem[]
 }
 
-model ProductInvetory {
+model ProductInventory {
   id                 Int            @id @default(autoincrement())
   product_variant_id Int
   product            ProductVariant @relation(fields: [product_variant_id], references: [id])

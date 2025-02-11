@@ -2,30 +2,105 @@ import { Injectable } from "@nestjs/common";
 import { Cart, CartItem, Product, ProductVariant, StoreSession } from "@prisma/client";
 import { generateUuid } from "modules/auth/helpers/uuid.helper";
 import { PrismaService } from "prisma/prisma.service";
-import { ProductT } from "shared/types";
+import { ProductT, ProductWithVariants } from "shared/types";
 import { serializeProduct, serializeProducts } from "../maper/product";
+import { CreateProductDto } from "modules/product/dto/product-create.dto";
+import { StorageService } from "modules/storage/storage.service";
+import { CustomConfigService } from "common/config/config.service";
 
 @Injectable()
 export class ProductRepository {
 	constructor(
 		private prisma: PrismaService,
+		private customConfig: CustomConfigService,
+		private storrageService: StorageService,
 	) { }
-	async createProduct(product: ProductT,) {
-		const uuid = generateUuid()
+
+	async updateProducts(productsID: string[], data: Partial<ProductT>) {
+		const updatePromises = productsID.map((id) => {
+			return this.prisma.product.update({
+				where: { uuid: id },
+				data,
+			});
+		});
+		await Promise.all(updatePromises);
+	}
+
+
+	async getProductVariantByUuid(productId: string) {
+		const productVariants = await this.prisma.productVariant.findUnique({
+			where: { uuid: productId },
+			include: { products: true },
+		});
+		return productVariants ?? null
+	}
+	async updateImagesProductVariant(variantUuid: string, images: string[]) {
+		const updatedProductVariant = await this.prisma.productVariant.update({
+			where: { uuid: variantUuid },
+			data: {
+				images: {
+					set: images,
+				},
+			},
+		});
+		return updatedProductVariant
+	}
+	async updateThumbneilProductVariant(variantUuid: string, image: string) {
+		const updatedProductVariant = await this.prisma.productVariant.update({
+			where: { uuid: variantUuid },
+			data: {
+				thumbnail: {
+					set: image,
+				},
+			},
+		});
+		return updatedProductVariant
+	}
+	async updateProductVariant(productId: string, data: Partial<ProductVariant>) {
+		const updatedProductVariant = await this.prisma.productVariant.update({
+			where: { uuid: productId },
+			data,
+		});
+		return updatedProductVariant
+	}
+
+	async createProduct(product: CreateProductDto): Promise<ProductWithVariants> {
+		const uuid = generateUuid();
+		const bucketName = this.customConfig.AWS_S3_BUCKET_NAME;
+		const slug = product.title.toLowerCase().replace(/ /g, '-');
+
+		// Upload images and collect their keys
+		const uploadedImages = await Promise.all(
+			product.variants.flatMap(variant =>
+				variant.images.map(async (image) => {
+					const fileName = `${generateUuid()}-${image.originalName}`;
+					const key = `products/files/${fileName}`;
+					const uploadedUrl = await this.storrageService.uploadFile(bucketName, key, image.base64, image.originalName);
+					return { key: uploadedUrl };
+				})
+			)
+		);
+
+
+		const groupedImages = product.variants.map(variant => ({
+			...variant,
+			images: uploadedImages.map(img => img.key),
+		}));
+
 		const createdProduct = await this.prisma.product.create({
 			data: {
-				slug: product.slug,
+				slug,
 				uuid,
+				title: product.title,
+				description: product.description,
 				productVariants: {
-					create: product.variants.map((variant) => ({
+					create: groupedImages.map(variant => ({
 						productVariant: {
 							create: {
 								price: variant.price,
-								thumbnail: variant.thumbnail,
+								thumbnail: variant.images[0],
 								uuid: generateUuid(),
-								description: variant.description,
 								images: variant.images,
-								slug: variant.slug,
 								color: variant.color,
 								width: variant.width,
 								weight: variant.weight,
@@ -39,8 +114,10 @@ export class ProductRepository {
 			},
 			include: { productVariants: { include: { productVariant: true } } },
 		});
-		return createdProduct
+
+		return createdProduct;
 	}
+
 	async getProducts() {
 		const productsData = await this.prisma.product.findMany({
 			include: { productVariants: { include: { productVariant: true } } },
