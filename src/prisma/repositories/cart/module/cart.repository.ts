@@ -60,19 +60,51 @@ export class CartRepository {
 			return newCartItem;
 		}
 	}
-	async updateCart({ uuid, data }: { uuid: string, data: CartItem[] }) {
-		const cart = await this.prisma.cart.update({
+	async updateCart({ uuid, data }: { uuid: string; data: CartItem[] }) {
+		const cart = await this.prisma.cart.findUnique({
 			where: { uuid },
-			data: {
-				items: {
-					create: data.map((item) => ({
-						product_variant_id: item.product_variant_id,
-						uuid: item.uuid,
-						quantity: item.quantity,
-					})),
-				},
-			},
+			include: { items: true },
 		});
-		return cart
+		if (!cart) throw new Error("Cart not found");
+		const newData = data.reduce((acc, item) => {
+			if (acc[item.product_variant_id]) {
+				acc[item.product_variant_id].quantity += item.quantity;
+			} else {
+				acc[item.product_variant_id] = { ...item };
+			}
+			return acc;
+		}, {} as Record<string, CartItem>);
+		const updates = Object.values(newData).map(async (item) => {
+			const existingItem = cart.items.find(
+				(i) => i.product_variant_id === item.product_variant_id
+			);
+			console.log('existingItem', existingItem)
+
+			if (existingItem) {
+				return this.prisma.cartItem.update({
+					where: { id: existingItem.id },
+					data: { quantity: existingItem.quantity },
+				});
+			} else {
+				return await this.prisma.cart.update({
+					where: { uuid: cart.uuid },
+					data: {
+						items: {
+							create: {
+								quantity: item.quantity,
+								uuid: item.uuid,
+								product_variant_id: item.product_variant_id,
+							},
+						},
+					},
+					include: { items: true },
+				});
+			}
+		});
+
+		await Promise.all(updates);
+
+		return this.prisma.cart.findUnique({ where: { uuid }, include: { items: true } });
 	}
+
 } 

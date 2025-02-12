@@ -19,6 +19,14 @@ export class LoginService {
       refreshToken,
       refreshTokenUpdatedAt: createdAt,
     });
+    const existSession = await this.sessionService.getSession({ uuid: updatedUser.sessionId })
+    if (existSession) {
+      const user = {
+        ...updatedUser,
+        sessionId: existSession.uuid
+      }
+      return { refreshToken, accessToken, user };
+    }
     const newSession = await this.sessionService.createSession()
     const connectedSession = await this.sessionService.connectUserToSession({
       sessionId: newSession.uuid,

@@ -37,7 +37,6 @@ export class AuthService {
       password,
       telephone,
     });
-    console.log('user', user)
 
     return normalizeUser(user);
   }
@@ -46,14 +45,12 @@ export class AuthService {
     params: Pick<IUser, 'refreshTokenUpdatedAt' | 'email' | 'refreshToken'>,
   ): Promise<INormalizedUser> {
     const { email, refreshTokenUpdatedAt, refreshToken } = params;
-    console.log('params', params)
     const hashedRefreshToken =
       await this.userRepositoryHelper.getHashedRefreshToken({ refreshToken });
     const user = await this.userRepository.findByEmailAndUpdate(email, {
       refreshToken: hashedRefreshToken,
       refreshTokenUpdatedAt,
     });
-    console.log('userasdasd', user)
 
     return normalizeUser(user);
   }

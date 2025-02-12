@@ -12,7 +12,6 @@ export const normalizeUser = (user: User & { StoreSession: { uuid: string }[] })
     StoreSession,
     uuid
   } = user;
-  console.log('userdddasd', user)
 
   return {
     email,

@@ -10,6 +10,11 @@ export class SessionRepository {
 	constructor(
 		private prisma: PrismaService,
 	) { }
+	async deleteSession({ uuid }: { uuid: string }) {
+		const session = await this.prisma.storeSession.delete({ where: { uuid } })
+		return session
+	}
+
 	async connectUserToSession({ sessionId, userId }: { sessionId: string, userId: string }) {
 		const user = await this.prisma.user.findUnique({ where: { uuid: userId } })
 		if (!user) throw new Error('User not found')
@@ -40,7 +45,7 @@ export class SessionRepository {
 		return session
 	}
 	async getSession({ uuid }: { uuid: string }) {
-		const session = await this.prisma.storeSession.findUnique({ where: { uuid }, include: { cart: { include: { items: true } } } })
+		const session = await this.prisma.storeSession.findUnique({ where: { uuid }, select: { uuid: true, cart: { include: { items: true } } } })
 		return session
 	}
 } 

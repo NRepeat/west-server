@@ -29,6 +29,7 @@ import {
   setAccessCookie,
 } from './helpers/set-access-cookie';
 import { SessionService } from 'modules/session/session.service';
+import { session } from 'passport';
 
 @Controller('auth')
 export class AuthController {
@@ -60,15 +61,16 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @Post('login')
   async login(
+    @Body() body: { session: string },
     @Request() req: { user: INormalizedUser },
     @Res() res: Response,
   ) {
     const { refreshToken, accessToken, user } = await this.loginService.login({
       email: req.user.email,
     });
-    console.log('user', user)
 
-    // this.sessionService.getSession()
+    const updatedCart = await this.sessionService.syncSession({ activeSessionId: body.session, sessionId: user.sessionId })
+
     res.cookie('access_token', accessToken, {
       httpOnly: true,
       secure: true,
@@ -79,7 +81,7 @@ export class AuthController {
       secure: true,
       sameSite: 'none',
     });
-    return res.json(user);
+    return res.json({ user, cartId: updatedCart?.uuid, sessionId: updatedCart?.storeSessionId });
   }
 
   @UseGuards(AccessTokenGuard)

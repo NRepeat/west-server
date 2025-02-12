@@ -18,4 +18,9 @@ export class SessionController {
 		const session = this.sessionService.syncSession(body)
 		return session
 	}
+	@Post('sync/cart')
+	syncSessionCart(@Body() body: { activeSessionId: string, cartId: string }) {
+		const session = this.sessionService.syncSessionCart(body)
+		return session
+	}
 }
