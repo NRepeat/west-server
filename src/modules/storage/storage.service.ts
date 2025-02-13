@@ -13,7 +13,7 @@ export class StorageService {
 	private s3: S3;
 	constructor(
 		private customConfigService: CustomConfigService,
-		private loger: Logger,
+		private logger: Logger,
 	) {
 		this.s3 = new S3({
 			region: 'eu-central-1',
@@ -22,6 +22,37 @@ export class StorageService {
 				secretAccessKey: customConfigService.AWS_SECRET_ACCESS_KEY,
 			},
 		});
+	}
+	async uploadGLTFile(
+		bucketName: string,
+		key: string,
+		file: Express.Multer.File
+	): Promise<string> {
+		try {
+			// Ensure it's a valid glTF file
+			const contentType =
+				mime.lookup(file.originalname) || 'application/octet-stream';
+
+			if (!contentType.startsWith('model/gltf')) {
+				throw new InternalServerErrorException('Invalid GLTF file format');
+			}
+
+			const putObject = new PutObjectCommand({
+				Bucket: bucketName,
+				Key: key,
+				Body: file.buffer,
+				ContentType: contentType,
+			});
+
+			await this.s3.send(putObject);
+
+			const fileUrl = `https://${bucketName}.s3.amazonaws.com/${key}`;
+			this.logger.log(`File uploaded successfully: ${fileUrl}`);
+			return fileUrl;
+		} catch (error) {
+			this.logger.error('Error uploading GLTF file:', error);
+			throw new InternalServerErrorException('Error uploading GLTF file');
+		}
 	}
 	async uploadFile(
 		bucketName: string,
@@ -72,7 +103,7 @@ export class StorageService {
 				(key) => `https://${bucketName}.s3.amazonaws.com/${key}`,
 			);
 		} catch (error) {
-			this.loger.error(error);
+			this.logger.error(error);
 			throw new InternalServerErrorException('Error uploading file to storage');
 		}
 	}
