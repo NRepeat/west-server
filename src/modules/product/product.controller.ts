@@ -17,7 +17,10 @@ export class ProductController {
 	getProducts() {
 		return this.productService.getProducts();
 	}
-
+	@Get('products/filters')
+	getProductsFilters() {
+		return this.productService.getProductsFilters();
+	}
 	@Get('slug')
 	getProductBySlug(@Query('slug') slug: string, @Query('variant') variant: string) {
 		console.log('variant', variant)

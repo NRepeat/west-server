@@ -80,15 +80,15 @@ model Product {
 model ProductVariant {
   id               Int                         @id @default(autoincrement())
   uuid             String                      @unique
-  color            String
+  color            Json
   images           String[]                    @default([])
   thumbnail        String?                     @default("")
   price            Float
-  width            Float
-  weight           Float
-  diameter         Float
-  et               Float
-  pcd              Float
+  width            String
+  weight           String
+  diameter         String
+  et               String
+  pcd              String
   created_at       DateTime                    @default(now())
   updated_at       DateTime                    @updatedAt
   products         ProductVariantsOnProducts[]

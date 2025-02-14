@@ -1,5 +1,4 @@
-import { Injectable, Logger } from "@nestjs/common";
-import { SessionRepository } from "prisma/repositories/session/module/session.repository";
+import { Inject, Injectable, Logger } from "@nestjs/common";
 import { CartRepository } from "prisma/repositories/cart/module/cart.repository";
 import { ImageFile, ProductT, SavedImage, } from "shared/types";
 import { ProductRepository } from "prisma/repositories/product/module/product.repository";
@@ -8,6 +7,8 @@ import { CustomConfigService } from "common/config/config.service";
 import { generateUuid } from "modules/auth/helpers/uuid.helper";
 import { extname } from "path";
 import { CreateProductDto } from "./dto/product-create.dto";
+import { CACHE_MANAGER } from "@nestjs/cache-manager";
+import { Cache } from "cache-manager";
 
 @Injectable()
 export class ProductService {
@@ -16,13 +17,60 @@ export class ProductService {
 		private readonly storrageService: StorageService,
 		private readonly productRepository: ProductRepository,
 		private readonly logger: Logger,
+		@Inject(CACHE_MANAGER) private cacheManager: Cache
 	) { }
 
 	async getProducts() {
 		const products = await this.productRepository.getProducts()
 		return products
 	}
+	async getProductsFilters() {
+		try {
+			const cacheKey = 'products:filters';
+			const cachedFilters = await this.cacheManager.get(cacheKey);
+			if (cachedFilters) {
+				return cachedFilters;
+			}
+			const products = await this.productRepository.getProducts();
+			const filters = {
+				colors: new Set<string>(),
+				widths: new Set<string>(),
+				diameters: new Set<string>(),
+				et: new Set<string>(),
+				pcd: new Set<string>(),
+				price: { min: 0, max: 0 }
+			};
+			products.forEach((product) => {
+				product.variants.forEach((variant) => {
+					filters.colors.add(JSON.stringify(variant.color));
+					filters.widths.add(variant.width);
+					filters.diameters.add(variant.diameter);
+					filters.et.add(variant.et);
+					filters.pcd.add(variant.pcd);
+					if (variant.price < filters.price.min) {
+						filters.price.min = variant.price;
+					}
+					if (variant.price > filters.price.max) {
+						filters.price.max = variant.price;
+					}
+				});
 
+			});
+			const formattedFilters = {
+				colors: Array.from(filters.colors),
+				widths: Array.from(filters.widths),
+				diameters: Array.from(filters.diameters),
+				et: Array.from(filters.et),
+				pcd: Array.from(filters.pcd),
+				price: filters.price
+			};
+
+			await this.cacheManager.set(cacheKey, formattedFilters);
+
+			return formattedFilters;
+		} catch (error) {
+		}
+	}
 	async saveImages(files: ImageFile[]): Promise<SavedImage[]> {
 		const bucketName = this.customConfig.AWS_S3_BUCKET_NAME
 		const images = files.map((file) => {

@@ -9,10 +9,10 @@ async function main() {
 	const productsData = [
 		{
 			slug: "product-1",
+			title: "Product 1",
 			variants: [
 				{
 					color: "Red",
-					description: "Красный вариант",
 					slug: "variant-1",
 					images: [],
 					thumbnail: "",
@@ -28,10 +28,10 @@ async function main() {
 		},
 		{
 			slug: "product-2",
+			title: "Product 2",
 			variants: [
 				{
 					color: "Blue",
-					description: "Синий вариант",
 					slug: "variant-2",
 					images: [],
 					thumbnail: "",
@@ -47,57 +47,64 @@ async function main() {
 		},
 	];
 
-	// 🔹 Создаём продукты
-	const createdProducts = await prisma.product.createMany({
-		data: productsData.map((product) => ({
-			uuid: uuidv4(),
-			slug: product.slug,
-		})),
-	});
+	await prisma.$transaction(async (prisma) => {
+		// 🔹 Создаём продукты
+		const createdProducts = await prisma.product.createMany({
+			data: productsData.map((product) => ({
+				uuid: uuidv4(),
+				title: product.title,
+				slug: product.slug,
+			})),
+			skipDuplicates: true,
+		});
 
-	// 🔹 Получаем созданные продукты
-	const storedProducts = await prisma.product.findMany();
+		console.log(`✅ Добавлено ${createdProducts.count} продуктов`);
 
-	for (const product of productsData) {
-		const storedProduct = storedProducts.find((p) => p.slug === product.slug);
-		if (!storedProduct) continue;
+		// 🔹 Получаем созданные продукты
+		const storedProducts = await prisma.product.findMany({
+			where: { slug: { in: productsData.map((p) => p.slug) } },
+		});
 
-		for (const variant of product.variants) {
-			// 🔹 Создаём вариант продукта
-			const createdVariant = await prisma.productVariant.create({
-				data: {
-					uuid: uuidv4(),
-					color: variant.color,
-					description: variant.description,
-					slug: variant.slug,
-					images: variant.images,
-					thumbnail: variant.thumbnail,
-					price: variant.price,
-					width: variant.width,
-					weight: variant.weight,
-					diameter: variant.diameter,
-					et: variant.et,
-					pcd: variant.pcd,
-				},
-			});
+		for (const product of productsData) {
+			const storedProduct = storedProducts.find((p) => p.slug === product.slug);
+			if (!storedProduct) continue;
 
-			// 🔹 Связываем продукт и вариант
-			await prisma.productVariantsOnProducts.create({
-				data: {
-					productId: storedProduct.id,
-					productVariantId: createdVariant.id,
-				},
-			});
+			for (const variant of product.variants) {
+				const createdVariant = await prisma.productVariant.create({
+					data: {
+						uuid: uuidv4(),
+						color: variant.color,
+						images: variant.images,
+						thumbnail: variant.thumbnail,
+						price: variant.price,
+						width: variant.width,
+						weight: variant.weight,
+						diameter: variant.diameter,
+						et: variant.et,
+						pcd: variant.pcd,
+					},
+				});
 
-			// 🔹 Создаём запись в инвентаре
-			await prisma.productInvetory.create({
-				data: {
-					product_variant_id: createdVariant.id,
-					quantity: variant.quantity,
-				},
-			});
+				// 🔹 Связываем продукт и вариант
+				await prisma.productVariantsOnProducts.create({
+					data: {
+						productId: storedProduct.id,
+						productVariantId: createdVariant.id,
+					},
+				});
+
+				// 🔹 Создаём запись в инвентаре
+				await prisma.productInventory.create({
+					data: {
+						product_variant_id: createdVariant.id,
+						quantity: variant.quantity,
+					},
+				});
+
+				console.log(`📦 Добавлен вариант ${variant.slug} для ${product.slug}`);
+			}
 		}
-	}
+	});
 
 	console.log("✅ Данные успешно добавлены!");
 }

@@ -56,10 +56,13 @@ export class ProductRepository {
 		});
 		return updatedProductVariant
 	}
-	async updateProductVariant(productId: string, data: Partial<ProductVariant>) {
+	async updateProductVariant(productId: string, data: Omit<Partial<ProductVariant>, 'id'>) {
 		const updatedProductVariant = await this.prisma.productVariant.update({
 			where: { uuid: productId },
-			data,
+			data: {
+				...data,
+				color: JSON.stringify(data.color),
+			}
 		});
 		return updatedProductVariant
 	}
@@ -68,8 +71,6 @@ export class ProductRepository {
 		const uuid = generateUuid();
 		const bucketName = this.customConfig.AWS_S3_BUCKET_NAME;
 		const slug = product.title.toLowerCase().replace(/ /g, '-');
-
-		// Upload images and collect their keys
 		const uploadedImages = await Promise.all(
 			product.variants.flatMap(variant =>
 				variant.images.map(async (image) => {
@@ -148,6 +149,7 @@ export class ProductRepository {
 			data: products.map((product) => ({
 				uuid: generateUuid(),
 				slug: product.slug,
+				title: product.title,
 			})),
 		});
 
@@ -163,9 +165,7 @@ export class ProductRepository {
 				const createdVariant = await this.prisma.productVariant.create({
 					data: {
 						uuid: generateUuid(),
-						color: variant.color,
-						description: variant.description,
-						slug: variant.slug,
+						color: JSON.stringify(variant.color),
 						images: variant.images,
 						thumbnail: variant.thumbnail,
 						price: variant.price,
@@ -184,8 +184,7 @@ export class ProductRepository {
 					},
 				});
 
-				// 🔹 Create the product inventory record
-				await this.prisma.productInvetory.create({
+				await this.prisma.productInventory.create({
 					data: {
 						product_variant_id: createdVariant.id,
 						quantity: variant.quantity,

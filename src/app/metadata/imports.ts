@@ -1,3 +1,4 @@
+import { CacheModule } from '@nestjs/cache-manager';
 import { ModuleMetadata } from '@nestjs/common';
 import { CommonModule } from 'common/common.module';
 import { CustomConfigModule } from 'common/config/config.module';
@@ -11,7 +12,7 @@ import { CartRepositoryModule } from 'prisma/repositories/cart/module/cart-repos
 import { ProductRepositoryModule } from 'prisma/repositories/product/module/product-repository.module';
 import { SessionRepositoryModule } from 'prisma/repositories/session/module/session-repository.module';
 import { UserRepositoryModule } from 'prisma/repositories/user/module/user-repository.module';
-
+import * as redisStore from 'cache-manager-ioredis';
 export const IMPORTS: ModuleMetadata['imports'] = [
   UserRepositoryModule,
   CustomConfigModule,
@@ -26,5 +27,11 @@ export const IMPORTS: ModuleMetadata['imports'] = [
   SessionRepositoryModule,
   ProductRepositoryModule,
   ProductModule,
-  CartRepositoryModule
+  CartRepositoryModule,
+  CacheModule.register({
+    isGlobal: true,
+    host: 'localhost',
+    port: 6379,
+    ttl: 300
+  })
 ];
