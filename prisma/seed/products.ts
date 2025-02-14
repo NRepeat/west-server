@@ -8,6 +8,44 @@ async function main() {
 
 	const productsData = [
 		{
+			slug: "product-4",
+			title: "Product 4",
+			variants: [
+				{
+					color: "Red",
+					slug: "variant-4",
+					images: [],
+					thumbnail: "",
+					price: 120.0,
+					width: "10cm",
+					weight: "500g",
+					diameter: "15cm",
+					et: "ET45",
+					pcd: "5x114.3",
+					quantity: 50,
+				},
+			],
+		},
+		{
+			slug: "product-3",
+			title: "Product 3",
+			variants: [
+				{
+					color: "Red",
+					slug: "variant-3",
+					images: [],
+					thumbnail: "",
+					price: 120.0,
+					width: "10cm",
+					weight: "500g",
+					diameter: "15cm",
+					et: "ET45",
+					pcd: "5x114.3",
+					quantity: 50,
+				},
+			],
+		},
+		{
 			slug: "product-1",
 			title: "Product 1",
 			variants: [
