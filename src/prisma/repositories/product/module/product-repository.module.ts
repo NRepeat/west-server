@@ -6,7 +6,7 @@ import { StorageService } from 'modules/storage/storage.service';
 @Global()
 @Module({
 	imports: [],
-	providers: [PrismaService, ProductRepository, CustomConfigService, StorageService, Logger],
+	providers: [PrismaService, ProductRepository, CustomConfigService, StorageService, Logger,],
 	exports: [ProductRepository],
 })
 export class ProductRepositoryModule { }

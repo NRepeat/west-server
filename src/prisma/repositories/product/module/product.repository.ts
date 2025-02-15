@@ -30,7 +30,7 @@ export class ProductRepository {
 	async getProductVariantByUuid(productId: string) {
 		const productVariants = await this.prisma.productVariant.findUnique({
 			where: { uuid: productId },
-			include: { products: true },
+			include: { products: { include: { product: true } } },
 		});
 		return productVariants ?? null
 	}
@@ -118,14 +118,63 @@ export class ProductRepository {
 
 		return createdProduct;
 	}
+	async getFilteredProducts(page: number = 1, limit: number = 10, sort: string, filters: { "widths": string[], "diameters": string[], "colors": string[], "et": string[], "pcd": string[] }, price: { min: number, max: number }) {
 
-	async getProducts() {
-		const productsData = await this.prisma.product.findMany({
+		const skip = (page - 1) * limit;
+		const whereConditions: any = {};
+		// Фильтры для размеров и других характеристик
+		if (filters.widths.length > 0) whereConditions.width = { in: filters.widths };
+		if (filters.diameters.length > 0) whereConditions.diameter = { in: filters.diameters };
+		if (filters.colors.length > 0) whereConditions.color = { in: filters.colors };
+		if (filters.et.length > 0) whereConditions.et = { in: filters.et };
+		if (filters.pcd.length > 0) whereConditions.pcd = { in: filters.pcd };
+
+		// Фильтр по цене
+		// if (price.min !== undefined && price.max !== undefined) {
+		// 	whereConditions.price = {
+		// 		gte: price.min,
+		// 		lte: price.max
+		// 	};
+		// }
+		const productsData = await this.prisma.productVariant.findMany({
+			where: whereConditions,
+			include: { products: { include: { product: true } } },
+			take: limit,
+			skip: skip,
+		});
+
+		const totalCount = await this.prisma.product.count();
+
+		return {
+			products: productsData,
+			total: totalCount,
+			page,
+			totalPages: Math.ceil(totalCount / limit),
+		};
+	}
+	async getAllProducts() {
+		const products = await this.prisma.product.findMany({
 			include: { productVariants: { include: { productVariant: true } } },
 		});
-		const products = serializeProducts(productsData)
+		return serializeProducts(products)
+	}
+	async getProducts(page: number = 1, limit: number = 10) {
+		const skip = (page - 1) * limit;
 
-		return products
+		const productsData = await this.prisma.product.findMany({
+			include: { productVariants: { include: { productVariant: true } } },
+			take: limit,
+			skip: skip,
+		});
+
+		const totalCount = await this.prisma.product.count();
+
+		return {
+			products: serializeProducts(productsData),
+			total: totalCount,
+			page,
+			totalPages: Math.ceil(totalCount / limit),
+		};
 	}
 	async getProductById(id: string) {
 		const product = await this.prisma.product.findUnique({
@@ -141,6 +190,8 @@ export class ProductRepository {
 		});
 		if (!productData) return null;
 		const product = serializeProduct(productData)
+		console.log('productData', productData)
+
 		return product
 	}
 	async createManyProducts(products: ProductT[]) {

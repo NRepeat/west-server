@@ -14,8 +14,8 @@ export class ProductController {
 	constructor(private readonly productService: ProductService) { }
 
 	@Get('products')
-	getProducts() {
-		return this.productService.getProducts();
+	getProducts(@Query('page') page: number, @Query('sort') sort: string, @Query('filters') filters: string, @Query('price') price: string) {
+		return this.productService.getProducts({ filters, page, price, sort });
 	}
 	@Get('products/filters')
 	getProductsFilters() {

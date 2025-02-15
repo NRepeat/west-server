@@ -20,8 +20,10 @@ export class ProductService {
 		@Inject(CACHE_MANAGER) private cacheManager: Cache
 	) { }
 
-	async getProducts() {
-		const products = await this.productRepository.getProducts()
+	async getProducts({ page, sort, filters, price }: { page: number, sort: string, filters: string, price: string }) {
+		const parsedFilters = JSON.parse(filters)
+		const parsedPrice = JSON.parse(price)
+		const products = await this.productRepository.getFilteredProducts(page, 10, sort, parsedFilters, parsedPrice)
 		return products
 	}
 	async getProductsFilters() {
@@ -31,7 +33,7 @@ export class ProductService {
 			if (cachedFilters) {
 				return cachedFilters;
 			}
-			const products = await this.productRepository.getProducts();
+			const products = await this.productRepository.getAllProducts();
 			const filters = {
 				colors: new Set<string>(),
 				widths: new Set<string>(),

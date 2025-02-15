@@ -12,7 +12,8 @@ import { CartRepositoryModule } from 'prisma/repositories/cart/module/cart-repos
 import { ProductRepositoryModule } from 'prisma/repositories/product/module/product-repository.module';
 import { SessionRepositoryModule } from 'prisma/repositories/session/module/session-repository.module';
 import { UserRepositoryModule } from 'prisma/repositories/user/module/user-repository.module';
-import * as redisStore from 'cache-manager-ioredis';
+import { CustomElasticsearchModule } from 'modules/elasticsearch/elasticsearch.module';
+
 export const IMPORTS: ModuleMetadata['imports'] = [
   UserRepositoryModule,
   CustomConfigModule,
@@ -24,6 +25,7 @@ export const IMPORTS: ModuleMetadata['imports'] = [
   CommonModule,
   StorageModule,
   CustomConfigModule,
+  CustomElasticsearchModule,
   SessionRepositoryModule,
   ProductRepositoryModule,
   ProductModule,
